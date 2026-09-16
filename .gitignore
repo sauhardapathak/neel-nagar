@@ -1,0 +1,23 @@
+# Godot
+.godot/
+*.import
+export_presets.cfg
+
+# Imported resources
+*.translation
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Build
+build/
+export/
