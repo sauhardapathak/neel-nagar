@@ -24,3 +24,6 @@ export/
 
 # Backup addon clones
 _assets/
+
+# Godot cache in addons
+addons/**/.godot/
