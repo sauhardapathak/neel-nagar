@@ -1,4 +1,4 @@
-# Neon Harbor — Rook's Run
+# Neel Nagar
 
 An original third-person open-world urban action sandbox built in **Godot 4.7.2** with GDScript.
 Featuring a Nepal-inspired procedural city, M.A.V.S vehicle physics, missions, police pursuit, and a full HUD.
@@ -42,7 +42,7 @@ Press **ENTER** or **Space** to start.
   objective tracking, cash and health rewards.
 - **Police / wanted system** — 4 wanted levels with heat mechanics, police vehicle spawning,
   pursuit AI (chase, circle, brake-check), alternating red/blue lights, and siren audio.
-- **Save system** — JSON persistence to `user://neon_harbor_save.json` with auto-save on
+- **Save system** — JSON persistence to `user://neel_nagar_save.json` with auto-save on
   mission completion. Saves player position, health, cash, and completed missions.
 - **HUD** — Health, cash, wanted stars, mission status, timer, and control hints.
 - **Day/night lighting** — Directional sun with shadows, ambient light, fog, and glow.
@@ -89,7 +89,7 @@ refined by AI, demonstrating the current capability of AI-assisted game developm
 
 - Import and headless run produce **zero** `SCRIPT ERROR`, `Parse Error`, or `Compile Error`
 - Visual QA via screenshot confirms: Nepal-style brick buildings with tiered roofs, HUD rendering
-  ("NEON HARBOR", "Health: 100%", "Cash: $0", "Wanted: None"), vehicle and player visible
+  ("NEEL NAGAR", "Health: 100%", "Cash: $0", "Wanted: None"), vehicle and player visible
 - All systems (missions, police, save, traffic, NPCs) wired into game loop without runtime errors
 
 ## License

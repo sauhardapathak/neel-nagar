@@ -606,7 +606,7 @@ func _setup_hud() -> void:
 
 	var title := Label.new()
 	title.name = "Title"
-	title.text = "NEON HARBOR"
+	title.text = "NEEL NAGAR"
 	title.add_theme_font_size_override("font_size", 20)
 	vbox.add_child(title)
 
@@ -698,7 +698,7 @@ func _process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("ui_accept") and not game_started:
 		game_started = true
-		_show_toast("Welcome to Kathmandu — Neon Harbor")
+		_show_toast("Welcome to Neel Nagar")
 
 	if Input.is_action_just_pressed("interact") and game_started:
 		_try_start_mission()

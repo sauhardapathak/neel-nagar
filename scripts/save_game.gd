@@ -3,7 +3,7 @@ extends Node
 signal game_saved
 signal game_loaded
 
-const SAVE_PATH: String = "user://neon_harbor_save.json"
+const SAVE_PATH: String = "user://neel_nagar_save.json"
 
 var player_position: Vector3 = Vector3.ZERO
 var player_health: int = 100
