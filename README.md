@@ -20,13 +20,25 @@ Press **ENTER** or **Space** to start.
 
 | Key | Action |
 |-----|--------|
-| `W A S D` | Move on foot |
+| `W A S D` / Arrows | Move on foot |
 | Mouse | Look / orbit camera |
 | `Shift` | Sprint |
-| `Space` | Jump |
+| `Space` | Jump (on foot) / Handbrake (vehicle) |
 | `E` | Enter / exit vehicle |
 | `F` | Start mission / interact |
+| `W` / `S` | Accelerate / brake (vehicle) |
+| `A` / `D` | Steer (vehicle) |
+| `Q` / `Z` | Shift up / down (manual gearbox) |
+| `1`–`5`, `6` | Select gear (manual gearbox) |
+| `L` | Headlights |
+| `C` | Change camera |
+| `R` | Reset / flip vehicle |
 | `Esc` | Pause |
+
+> All movement and vehicle bindings are defined in `project.godot` (InputMap). The player reads
+> `move_forward/back/left/right`, `sprint`, and `jump`; the M.A.V.S vehicle reads
+> `Acceleration`, `Brake`, `Left`, `Right`, `Hand Brake`, `Nitro`, `Lights`, `Camera Change`,
+> `Reset`, `Shift Up`, `Shift Down`, and `Gear 1`–`Gear 5` / `Gear Reverse`.
 
 ## Features
 

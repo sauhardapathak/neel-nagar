@@ -29,6 +29,8 @@ var game_started := false
 var paused := false
 var _shot_mode := false
 var _shot_frames := 0
+var _move_test := false
+var _move_start := Vector3.ZERO
 
 var minimap_viewport: SubViewport
 var minimap_camera: Camera3D
@@ -84,6 +86,7 @@ func _ready() -> void:
 	if _shot_mode:
 		game_started = true
 		print("SHOT MODE ACTIVE - will save screenshot after 90 frames")
+	_move_test = OS.get_cmdline_args().has("--movetest") or OS.get_cmdline_user_args().has("--movetest")
 
 	_build_environment()
 	_build_nepal_city()
@@ -587,6 +590,12 @@ func _spawn_vehicles() -> void:
 	for pos in positions:
 		var car := car_scene.instantiate()
 		car.position = pos
+		car.set("key_gear_1", "Gear 1")
+		car.set("key_gear_2", "Gear 2")
+		car.set("key_gear_3", "Gear 3")
+		car.set("key_gear_4", "Gear 4")
+		car.set("key_gear_5", "Gear 5")
+		car.set("key_gear_reverse", "Gear Reverse")
 		vehicle_container.add_child(car)
 
 func _spawn_npcs() -> void:
@@ -652,7 +661,7 @@ func _setup_hud() -> void:
 
 	var controls := Label.new()
 	controls.name = "Controls"
-	controls.text = "WASD: Move | Shift: Run | Space: Jump\nE: Vehicle | F: Mission | ESC: Pause"
+	controls.text = "WASD / Arrows: Move | Shift: Sprint | Space: Jump\nE: Enter/Exit Vehicle | F: Mission | L: Lights | C: Camera | Esc: Pause"
 	controls.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	controls.offset_top = -50
 	controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -753,6 +762,21 @@ func _connect_systems() -> void:
 	)
 
 func _process(delta: float) -> void:
+	if _move_test:
+		_shot_frames += 1
+		if _shot_frames == 10:
+			_move_start = player.global_position
+			print("MOVETEST actions present: forward=", InputMap.has_action("move_forward"), " sprint=", InputMap.has_action("run"), " jump=", InputMap.has_action("jump"), " accel=", InputMap.has_action("Acceleration"))
+			Input.action_press("move_forward")
+			Input.action_press("run")
+		if _shot_frames == 80:
+			var end_pos: Vector3 = player.global_position
+			print("MOVETEST start=", _move_start, " end=", end_pos, " delta=", end_pos - _move_start, " dist=", _move_start.distance_to(end_pos))
+			Input.action_release("move_forward")
+			Input.action_release("run")
+			get_tree().quit()
+			return
+
 	if _shot_mode:
 		_shot_frames += 1
 		if _shot_frames == 90:
