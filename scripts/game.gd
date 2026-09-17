@@ -30,6 +30,12 @@ var paused := false
 var _shot_mode := false
 var _shot_frames := 0
 
+var minimap_viewport: SubViewport
+var minimap_camera: Camera3D
+var compass_label: Label
+var speed_label: Label
+var mission_arrow: Label
+
 const NEPAL_BRICK := Color(0.545, 0.224, 0.165)
 const NEPAL_BRICK_DARK := Color(0.478, 0.231, 0.180)
 const NEPAL_WOOD := Color(0.243, 0.153, 0.137)
@@ -77,7 +83,7 @@ func _ready() -> void:
 	_shot_mode = OS.get_cmdline_args().has("--shot") or OS.get_cmdline_user_args().has("--shot")
 	if _shot_mode:
 		game_started = true
-		print("SHOT MODE ACTIVE - will save screenshot after 60 frames")
+		print("SHOT MODE ACTIVE - will save screenshot after 90 frames")
 
 	_build_environment()
 	_build_nepal_city()
@@ -596,7 +602,7 @@ func _setup_hud() -> void:
 	var panel := PanelContainer.new()
 	panel.name = "InfoPanel"
 	panel.offset_right = 300
-	panel.offset_bottom = 140
+	panel.offset_bottom = 190
 	panel.position = Vector2(10, 10)
 	hud.add_child(panel)
 
@@ -612,6 +618,12 @@ func _setup_hud() -> void:
 
 	var sep := HSeparator.new()
 	vbox.add_child(sep)
+
+	compass_label = Label.new()
+	compass_label.name = "Compass"
+	compass_label.text = "Heading: N"
+	compass_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	vbox.add_child(compass_label)
 
 	var health_label := Label.new()
 	health_label.name = "Health"
@@ -646,6 +658,74 @@ func _setup_hud() -> void:
 	controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hud.add_child(controls)
 
+	mission_arrow = Label.new()
+	mission_arrow.name = "MissionArrow"
+	mission_arrow.text = "▶"
+	mission_arrow.add_theme_font_size_override("font_size", 48)
+	mission_arrow.add_theme_color_override("font_color", Color(1.0, 0.85, 0.0))
+	mission_arrow.visible = false
+	mission_arrow.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	mission_arrow.offset_top = -30
+	mission_arrow.offset_bottom = 30
+	mission_arrow.offset_left = -20
+	mission_arrow.offset_right = 20
+	hud.add_child(mission_arrow)
+
+	_setup_minimap()
+	_setup_speedometer()
+
+func _setup_minimap() -> void:
+	var container := SubViewportContainer.new()
+	container.name = "Minimap"
+	container.custom_minimum_size = Vector2(120, 120)
+	container.size = Vector2(120, 120)
+	var vs: Vector2 = get_viewport().get_visible_rect().size
+	container.position = Vector2(vs.x - 140, 10)
+	minimap_viewport = SubViewport.new()
+	minimap_viewport.name = "MinimapViewport"
+	minimap_viewport.size = Vector2i(120, 120)
+	minimap_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	minimap_viewport.transparent_bg = false
+	minimap_viewport.own_world_3d = false
+	container.add_child(minimap_viewport)
+	hud.add_child(container)
+	minimap_camera = Camera3D.new()
+	minimap_camera.name = "MinimapCamera"
+	minimap_camera.position = Vector3(0, 80, 0)
+	minimap_camera.rotation_degrees.x = -90
+	minimap_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+	minimap_camera.size = 120.0
+	minimap_camera.near = 0.5
+	minimap_camera.far = 200.0
+	minimap_viewport.add_child(minimap_camera)
+
+func _setup_speedometer() -> void:
+	speed_label = Label.new()
+	speed_label.name = "Speedometer"
+	speed_label.text = "0 km/h"
+	speed_label.add_theme_font_size_override("font_size", 20)
+	speed_label.add_theme_color_override("font_color", Color.WHITE)
+	speed_label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	speed_label.add_theme_constant_override("outline_size", 4)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0, 0, 0, 0.5)
+	sb.content_margin_left = 12
+	sb.content_margin_right = 12
+	sb.content_margin_top = 4
+	sb.content_margin_bottom = 4
+	sb.corner_radius_top_left = 6
+	sb.corner_radius_top_right = 6
+	sb.corner_radius_bottom_left = 6
+	sb.corner_radius_bottom_right = 6
+	speed_label.add_theme_stylebox_override("normal", sb)
+	speed_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	speed_label.offset_left = -140
+	speed_label.offset_top = -44
+	speed_label.offset_right = -14
+	speed_label.offset_bottom = -12
+	speed_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	hud.add_child(speed_label)
+
 func _connect_systems() -> void:
 	missions.mission_started.connect(func(name: String) -> void:
 		current_mission = name
@@ -675,10 +755,10 @@ func _connect_systems() -> void:
 func _process(delta: float) -> void:
 	if _shot_mode:
 		_shot_frames += 1
-		if _shot_frames == 5:
+		if _shot_frames == 90:
 			var img := get_viewport().get_texture().get_image()
 			if img:
-				var save_path := "C:/Users/Administrator/Downloads/Documents/Godot_v4.7.2-stable_win64/NeonHarbor/qa_shot.png"
+				var save_path := ProjectSettings.globalize_path("res://qa_shot.png")
 				img.save_png(save_path)
 				print("Screenshot saved to: " + save_path)
 			else:
@@ -706,6 +786,10 @@ func _process(delta: float) -> void:
 	if missions.call("get_current_mission_info") != {}:
 		_check_mission_proximity()
 
+	_update_mission_arrow()
+	_update_compass()
+	_update_speedometer()
+	_update_minimap()
 	_update_hud()
 
 func _check_mission_proximity() -> void:
@@ -787,6 +871,76 @@ func _show_toast(text: String) -> void:
 	tween.tween_property(toast, "modulate:a", 0.0, 0.5)
 	tween.tween_callback(toast.queue_free)
 
+func _update_mission_arrow() -> void:
+	if not mission_arrow:
+		return
+	var info: Dictionary = missions.call("get_current_mission_info")
+	if info.is_empty():
+		mission_arrow.visible = false
+		return
+	var positions: Array = missions.current_mission.get("objective_positions", [])
+	var idx: int = info.get("objective_index", 0)
+	if idx >= positions.size():
+		mission_arrow.visible = false
+		return
+	var target_pos: Vector3 = positions[idx]
+	var player_pos: Vector3 = current_vehicle.global_position if player_in_vehicle and current_vehicle else player.global_position
+	var direction: Vector3 = target_pos - player_pos
+	var angle: float = atan2(direction.x, direction.z)
+	mission_arrow.rotation = -angle
+	var dist: float = player_pos.distance_to(target_pos)
+	mission_arrow.text = "▶ " + str(int(dist)) + "m"
+	mission_arrow.visible = true
+
+func _update_compass() -> void:
+	if not compass_label or not player:
+		return
+	var forward := -player.global_transform.basis.z
+	var heading := rad_to_deg(atan2(forward.x, forward.z))
+	if heading < 0:
+		heading += 360.0
+	var dir := ""
+	if heading >= 337.5 or heading < 22.5:
+		dir = "N"
+	elif heading >= 22.5 and heading < 67.5:
+		dir = "NE"
+	elif heading >= 67.5 and heading < 112.5:
+		dir = "E"
+	elif heading >= 112.5 and heading < 157.5:
+		dir = "SE"
+	elif heading >= 157.5 and heading < 202.5:
+		dir = "S"
+	elif heading >= 202.5 and heading < 247.5:
+		dir = "SW"
+	elif heading >= 247.5 and heading < 292.5:
+		dir = "W"
+	else:
+		dir = "NW"
+	compass_label.text = "Heading: " + dir
+
+func _update_speedometer() -> void:
+	if not speed_label:
+		return
+	var speed_kmh := 0.0
+	if player_in_vehicle and current_vehicle:
+		speed_kmh = current_vehicle.linear_velocity.length() * 3.6
+	elif player:
+		speed_kmh = player.velocity.length() * 3.6
+	speed_label.text = "%d km/h" % int(speed_kmh)
+
+func _update_minimap() -> void:
+	if not minimap_camera or not player:
+		return
+	var pp: Vector3 = player.global_position
+	if player_in_vehicle and current_vehicle:
+		pp = current_vehicle.global_position
+	var above := pp + Vector3(0, 80, 0)
+	var fwd := -player.global_transform.basis.z
+	var up := Vector3(fwd.x, 0, fwd.z)
+	if up.length() < 0.01:
+		up = Vector3(0, 0, -1)
+	minimap_camera.look_at_from_position(above, pp, up.normalized())
+
 func _update_hud() -> void:
 	var info_panel := hud.get_node_or_null("InfoPanel/Info")
 	if not info_panel:
@@ -794,9 +948,12 @@ func _update_hud() -> void:
 	info_panel.get_node("Health").text = "Health: %d%%" % health
 	info_panel.get_node("Cash").text = "Cash: $%d" % cash
 	var stars := ""
-	for i in range(wanted_level):
-		stars += "*"
-	info_panel.get_node("Wanted").text = "Wanted: " + ("None" if wanted_level == 0 else stars)
+	for i in range(5):
+		if i < wanted_level:
+			stars += "★"
+		else:
+			stars += "☆"
+	info_panel.get_node("Wanted").text = "Wanted: " + ("☆☆☆☆☆" if wanted_level == 0 else stars)
 	info_panel.get_node("Mission").text = current_mission if current_mission != "" else ""
 	var mission_info: Dictionary = missions.call("get_current_mission_info")
 	var time_remaining: float = mission_info.get("time_remaining", -1.0)

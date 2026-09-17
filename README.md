@@ -44,13 +44,14 @@ Press **ENTER** or **Space** to start.
   pursuit AI (chase, circle, brake-check), alternating red/blue lights, and siren audio.
 - **Save system** — JSON persistence to `user://neel_nagar_save.json` with auto-save on
   mission completion. Saves player position, health, cash, and completed missions.
-- **HUD** — Health, cash, wanted stars, mission status, timer, and control hints.
+- **HUD** — Health, cash, 5-star wanted meter, compass heading, speedometer (km/h), live minimap
+  (top-down SubViewport camera following the player), mission arrow with distance, and control hints.
 - **Day/night lighting** — Directional sun with shadows, ambient light, fog, and glow.
 
 ## Architecture
 
 ```
-NeonHarbor/
+NeelNagar/
   project.godot              physics layers, input map, rendering config
   scenes/
     Main.tscn                root scene, attaches game.gd
