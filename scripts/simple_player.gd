@@ -16,11 +16,20 @@ func _ready() -> void:
 	camera_pivot.position = Vector3(0, 2, 0)
 	add_child(camera_pivot)
 
+	# SpringArm3D pulls the camera in when buildings block it (camera-systems:
+	# separate look from collision; static tilt preserves the old (0,3,-8) frame).
+	var arm := SpringArm3D.new()
+	arm.name = "CameraArm"
+	arm.spring_length = 8.54
+	arm.rotation.x = -0.36
+	arm.collision_mask = 1
+	camera_pivot.add_child(arm)
+
 	camera = Camera3D.new()
 	camera.name = "Camera"
-	camera.position = Vector3(0, 3, -8)
-	camera.rotation.x = -0.15
-	camera_pivot.add_child(camera)
+	camera.position = Vector3.ZERO
+	camera.rotation.x = 0.21
+	arm.add_child(camera)
 
 	model = Node3D.new()
 	model.name = "Model"

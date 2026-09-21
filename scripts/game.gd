@@ -566,7 +566,7 @@ func _spawn_player() -> void:
 	p.collision_mask = 1
 	add_child(p)
 	player = p
-	original_camera = p.get_node_or_null("CameraPivot/Camera")
+	original_camera = p.get_node_or_null("CameraPivot/CameraArm/Camera")
 
 	var area := Area3D.new()
 	area.name = "VehicleInteractionArea"
@@ -601,10 +601,13 @@ func _spawn_vehicles() -> void:
 
 func _spawn_npcs() -> void:
 	var npc_scene := preload("res://scenes/NPC.tscn")
+	var spawn_rng := RandomNumberGenerator.new()
+	spawn_rng.seed = 777
 	for i in range(20):
 		var npc := npc_scene.instantiate()
-		var angle := randf() * TAU
-		var dist := randf_range(10, 60)
+		npc.set_meta("spawn_index", i)
+		var angle := spawn_rng.randf() * TAU
+		var dist := spawn_rng.randf_range(10, 60)
 		npc.position = Vector3(cos(angle) * dist, 1, sin(angle) * dist)
 		npc_container.add_child(npc)
 
