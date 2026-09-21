@@ -58,6 +58,9 @@ Press **ENTER** or **Space** to start.
   mission completion. Saves player position, health, cash, and completed missions.
 - **HUD** — Health, cash, 5-star wanted meter, compass heading, speedometer (km/h), live minimap
   (top-down SubViewport camera following the player), mission arrow with distance, and control hints.
+- **Blender-made props** — Original low-poly street props modeled in Blender 5.2 via the Blender MCP
+  socket bridge and exported as glTF: prayer-flag strings, market stalls with produce, glowing street
+  lanterns, and roadside shrines. Instanced into the city with collision in `game.gd`.
 - **Day/night lighting** — Directional sun with shadows, ambient light, fog, and glow.
 
 ## Architecture

@@ -93,6 +93,7 @@ func _ready() -> void:
 	_spawn_player()
 	_spawn_vehicles()
 	_spawn_npcs()
+	_spawn_blender_props()
 	_setup_hud()
 	_connect_systems()
 	_load_game()
@@ -606,6 +607,46 @@ func _spawn_npcs() -> void:
 		var dist := randf_range(10, 60)
 		npc.position = Vector3(cos(angle) * dist, 1, sin(angle) * dist)
 		npc_container.add_child(npc)
+
+func _spawn_blender_props() -> void:
+	var specs := [
+		{"path": "res://assets/props/market_stall.glb",
+		 "items": [[Vector3(0.0, 0, -22.0), 0.0], [Vector3(12.0, 0, 9.5), -0.3]],
+		 "collider": Vector3(2.4, 2.2, 1.6), "collider_y": 1.1},
+		{"path": "res://assets/props/roadside_shrine.glb",
+		 "items": [[Vector3(-12.0, 0, -10.0), 0.5]],
+		 "collider": Vector3(2.2, 2.5, 2.2), "collider_y": 1.25},
+		{"path": "res://assets/props/street_lantern.glb",
+		 "items": [[Vector3(3.5, 0, 14.0), 0.0], [Vector3(-3.5, 0, 14.0), 0.0],
+				   [Vector3(3.5, 0, -14.0), 0.0], [Vector3(-3.5, 0, -14.0), 0.0]],
+		 "collider": Vector3.ZERO, "collider_y": 0.0},
+		{"path": "res://assets/props/prayer_flags.glb",
+		 "items": [[Vector3(0.0, 0, 26.0), 0.0]],
+		 "collider": Vector3.ZERO, "collider_y": 0.0},
+	]
+	for spec in specs:
+		var ps: PackedScene = load(spec["path"])
+		if ps == null:
+			push_warning("Prop missing: " + str(spec["path"]))
+			continue
+		for item in spec["items"]:
+			var inst := ps.instantiate()
+			inst.position = item[0]
+			inst.rotation.y = item[1]
+			world.add_child(inst)
+			var csize: Vector3 = spec["collider"]
+			if csize.length() > 0.01:
+				var body := StaticBody3D.new()
+				body.collision_layer = 1
+				body.collision_mask = 0
+				body.position = item[0] + Vector3(0, spec["collider_y"], 0)
+				var col := CollisionShape3D.new()
+				var shape := BoxShape3D.new()
+				shape.size = csize
+				col.shape = shape
+				body.add_child(col)
+				world.add_child(body)
+	print("PROPS spawned: market_stall x2, shrine x1, lanterns x4, prayer_flags x1")
 
 func _setup_hud() -> void:
 	var panel := PanelContainer.new()
