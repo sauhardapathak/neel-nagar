@@ -11,7 +11,7 @@ implement, debug, and polish a complete game from concept to working product.
 Open the project folder in Godot 4.7.2, or from a terminal:
 
 ```powershell
-Godot_v4.7.2-stable_win64_console.exe --path "<path-to>/NeonHarbor"
+Godot_v4.7.2-stable_win64_console.exe --path "<path-to>/NeelNagar"
 ```
 
 Press **ENTER** or **Space** to start.
